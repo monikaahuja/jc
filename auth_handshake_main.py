@@ -1,7 +1,4 @@
-# File: jcr_data_pipeline/cloud_functions/auth_handshake/main.py
-# Purpose: Cloud Function for JCR API authentication handshake
-# Dependencies: requirements.txt in the same directory
-
+# File: cloud_functions/auth_handshake/main.py
 import functions_framework
 from google.cloud import secretmanager
 import requests
@@ -45,16 +42,21 @@ def get_auth_token(base_url: str, user_id: str, password: str) -> dict:
 def handle_auth_request(request):
     """Cloud Function to handle authentication with JCR API."""
     try:
+        # Get project configuration
         project_id = os.environ.get('GCP_PROJECT')
+        
+        # Get credentials from Secret Manager
         user_id = get_secret(project_id, "jcr-user-id")
         password = get_secret(project_id, "jcr-password")
         base_url = get_secret(project_id, "jcr-base-url")
         
+        # Get authentication token
         auth_data = get_auth_token(base_url, user_id, password)
         
         return json.dumps({"success": True, "data": auth_data}), 200, {
             'Content-Type': 'application/json'
         }
+        
     except Exception as e:
         error_message = f"Authentication failed: {str(e)}"
         logger.error(error_message)

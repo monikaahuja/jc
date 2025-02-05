@@ -1,3 +1,4 @@
+# File: cloud_functions/auth_handshake/requirements.txt
 functions-framework==3.*
 google-cloud-secret-manager==2.*
 requests==2.*
