@@ -1,0 +1,67 @@
+# File: jcr_data_pipeline/cloud_functions/observation_details/main.py
+# Purpose: Cloud Function for retrieving and storing JCR observation details
+# Dependencies: requirements.txt in the same directory
+
+import functions_framework
+import requests
+from google.cloud import bigquery
+import json
+import logging
+from datetime import datetime
+import os
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load BigQuery schemas from environment variable or config file
+SCHEMAS = {
+    'observation_details': [
+        bigquery.SchemaField("observation_id", "INTEGER"),
+        bigquery.SchemaField("question_id", "INTEGER"),
+        bigquery.SchemaField("additional_information", "STRING"),
+        bigquery.SchemaField("multiple_choices", "STRING"),
+        bigquery.SchemaField("numerator", "INTEGER"),
+        bigquery.SchemaField("denominator", "INTEGER"),
+        bigquery.SchemaField("is_not_applicable", "BOOLEAN"),
+        bigquery.SchemaField("question_response", "STRING"),
+        bigquery.SchemaField("created_at", "TIMESTAMP"),
+        bigquery.SchemaField("processed_at", "TIMESTAMP")
+    ]
+}
+
+def get_observation_details(base_url: str, headers: dict, site_ids: str, 
+                          from_date: str, thru_date: str) -> dict:
+    """Retrieve observation details from JCR API."""
+    endpoint = f"{base_url}/external/api/v1.0/Observation/ObservationDetails"
+    
+    payload = {
+        "site_id": site_ids,
+        "from_date": from_date,
+        "thru_date": thru_date
+    }
+    
+    try:
+        response = requests.post(endpoint, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"API error: {e}")
+        raise
+
+@functions_framework.http
+def handle_observation_details(request):
+    """Cloud Function to handle observation details retrieval and storage."""
+    try:
+        # Validate request
+        request_json = request.get_json(silent=True)
+        if not request_json:
+            raise ValueError("Missing request data")
+            
+        required_fields = ['auth_headers', 'site_ids', 'from_date', 'thru_date']
+        for field in required_fields:
+            if field not in request_json:
+                raise ValueError(f"Missing required field: {field}")
+        
+        # Get configuration
+        project_id = os.environ.get('GCP_PROJECT')
+        dataset_id = os.environ.get('

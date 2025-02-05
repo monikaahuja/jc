@@ -1,0 +1,56 @@
+{
+    "observation_summary": {
+        "fields": [
+            {"name": "site_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "hco_id", "type": "INTEGER", "mode": "NULLABLE"},
+            {"name": "program_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "site_name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "program_name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "has_active_license", "type": "BOOLEAN", "mode": "REQUIRED"},
+            {"name": "observations_found", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "updated_from", "type": "TIMESTAMP", "mode": "REQUIRED"},
+            {"name": "updated_thru", "type": "TIMESTAMP", "mode": "REQUIRED"}
+        ],
+        "partitioning": {
+            "field": "updated_thru",
+            "type": "DAY"
+        },
+        "clustering": ["site_id", "program_id"]
+    },
+    "observation_details": {
+        "fields": [
+            {"name": "observation_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "question_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "additional_information", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "multiple_choices", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "numerator", "type": "INTEGER", "mode": "NULLABLE"},
+            {"name": "denominator", "type": "INTEGER", "mode": "NULLABLE"},
+            {"name": "is_not_applicable", "type": "BOOLEAN", "mode": "REQUIRED"},
+            {"name": "question_response", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED"},
+            {"name": "processed_at", "type": "TIMESTAMP", "mode": "REQUIRED"}
+        ],
+        "clustering": ["observation_id", "question_id"]
+    },
+    "observation_headers": {
+        "fields": [
+            {"name": "tracer_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "observation_id", "type": "INTEGER", "mode": "REQUIRED"},
+            {"name": "observation_title", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "contracted_service", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "survey_team", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "staff_interviewed", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "medical_staff_involved", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "location", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "observation_status", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "department", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "observation_date", "type": "TIMESTAMP", "mode": "REQUIRED"},
+            {"name": "last_updated", "type": "TIMESTAMP", "mode": "REQUIRED"}
+        ],
+        "partitioning": {
+            "field": "observation_date",
+            "type": "DAY"
+        },
+        "clustering": ["tracer_id", "observation_id"]
+    }
+}
